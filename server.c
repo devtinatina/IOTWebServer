@@ -1,7 +1,7 @@
 #include "stems.h"
 #include "request.h"
 
-// 
+//
 // To run:
 // 1. Edit config-ws.txt with following contents
 //    <port number>
@@ -27,7 +27,6 @@ void consumer(int connfd, long arrivalTime)
   Close(connfd);
 }
 
-
 int main(void)
 {
   int listenfd, connfd, port, clientlen;
@@ -37,10 +36,11 @@ int main(void)
   getargs_ws(&port);
 
   listenfd = Open_listenfd(port);
-  while (1) {
+  while (1)
+  {
     clientlen = sizeof(clientaddr);
-    connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *) &clientlen);
+    connfd = Accept(listenfd, (SA *)&clientaddr, (socklen_t *)&clientlen);
     consumer(connfd, getWatch());
   }
-  return(0);
+  return (0);
 }

@@ -5,7 +5,7 @@
 
 //
 // This program is intended to help you test your web server.
-// You can use it to test that you are correctly having multiple 
+// You can use it to test that you are correctly having multiple
 // threads handling http requests.
 //
 // htmlReturn() is used if client program is a general web client
@@ -28,15 +28,16 @@ void htmlReturn(void)
   sprintf(content, "%s</head>\r\n", content);
   sprintf(content, "%s<body>\r\n", content);
   sprintf(content, "%s<h2>Welcome to the CGI program</h2>\r\n", content);
-  buf = getenv("QUERY_STRING");
-  sprintf(content,"%s<p>Env : %s</p>\r\n", content, buf);
+  buf = Getenv("QUERY_STRING");
+  sprintf(content, "%s<p>Env : %s</p>\r\n", content, buf);
   ptr = strsep(&buf, "&");
-  while (ptr != NULL){
+  while (ptr != NULL)
+  {
     sprintf(content, "%s%s\r\n", content, ptr);
     ptr = strsep(&buf, "&");
   }
   sprintf(content, "%s</body>\r\n</html>\r\n", content);
-  
+
   /* Generate the HTTP response */
   printf("Content-Length: %d\r\n", strlen(content));
   printf("Content-Type: text/html\r\n\r\n");
@@ -50,14 +51,15 @@ void textReturn(void)
   char *buf;
   char *ptr;
 
-  buf = getenv("QUERY_STRING");
-  sprintf(content,"%sEnv : %s\n", content, buf);
+  buf = Getenv("QUERY_STRING");
+  sprintf(content, "%sEnv : %s\n", content, buf);
   ptr = strsep(&buf, "&");
-  while (ptr != NULL){
+  while (ptr != NULL)
+  {
     sprintf(content, "%s%s\n", content, ptr);
     ptr = strsep(&buf, "&");
   }
-  
+
   /* Generate the HTTP response */
   printf("Content-Length: %d\n", strlen(content));
   printf("Content-Type: text/plain\r\n\r\n");
@@ -69,5 +71,5 @@ int main(void)
 {
   htmlReturn();
   //textReturn();
-  return(0);
+  return (0);
 }
