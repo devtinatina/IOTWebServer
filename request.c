@@ -85,7 +85,8 @@ void requestReadhdrs(rio_t *rp, int *length)
 //
 int parseURI(char *uri, char *filename, char *cgiargs)
 {
-  if (!strstr(uri, "cgi"))
+  //"cgi" -> ".cgi"
+  if (!strstr(uri, ".cgi"))
   {
     // static
     strcpy(cgiargs, "");
@@ -100,12 +101,13 @@ int parseURI(char *uri, char *filename, char *cgiargs)
   {
     // dynamic
     /* seperate a uri to a filename and a cgiargs. For example,
-       if uri is "/output.cgi?100&TEST" then filename is 
-       "./output.cgi" and cgiargs is "100&TEST" (? is not copied)
-    */
+           if uri is "/output.cgi?100&TEST" then filename is
+           "./output.cgi" and cgiargs is "100&TEST" (? is not copied)
+        */
     // ..
     // implement parse for dynamic URI
     // ..
+
     char cpy[MAXLINE];
     strcpy(cpy, uri);
     char *ptr = strtok(cpy, "?");
@@ -115,8 +117,10 @@ int parseURI(char *uri, char *filename, char *cgiargs)
     ptr = strtok(NULL, "?");
     sprintf(cgiargs, "%s", ptr);
 
-    // following codes are dummy which should be deleted later
-    // sprintf(filename, "./%s", uri);
+    /*printf("\n\nuri : %s\n", uri);
+        printf("cgi filename : %s\n", filename);
+        printf("cgiargs : %s\n\n", cgiargs);*/
+
     return DYNAMIC;
   }
 }
@@ -138,23 +142,43 @@ void requestGetFiletype(char *filename, char *filetype)
 
 void requestServeDynamic(rio_t *rio, int fd, char *filename, char *cgiargs, int bodyLength, double arrivalTime)
 {
-
   int res;
   int pid;
+  int pipe[2];
   char *argv[] = {NULL};
+  //added level_2
+  char tbodylengh[MAXLINE];
 
+  if (bodyLength > 0)
+  {
+    Rio_readlineb(rio, cgiargs, bodyLength + 1);
+  }
+  
+  sprintf(tbodylengh, "%d", strlen(cgiargs));
+
+  //added level_2
+  Pipe(pipe);
   Setenv("QUERY_STRING", cgiargs, 1);
+  Setenv("CONTENT_LENGTH", tbodylengh, 1);
+
   pid = Fork();
 
   if (pid == 0)
   {
-    // printf("Child: it works.\n");
+    /*	do	child	job	*/
+    //added level_2
+    Dup2(pipe[0], STDIN_FILENO);
+    Dup2(fd, STDOUT_FILENO);
+
     Execve(filename, argv, environ);
   }
   else if (pid > 0)
   {
+    Write(pipe[1], cgiargs, strlen(cgiargs));
+    /*	do	parent	job	*/
     Wait(&res);
   }
+
   return;
 }
 
@@ -214,6 +238,7 @@ void requestHandle(int connfd, double arrivalTime)
                  "My Server does not implement this method");
     return;
   }
+
   if (stat(filename, &sbuf) < 0)
   {
     Rio_readrestb(&rio, buf);
@@ -237,6 +262,7 @@ void requestHandle(int connfd, double arrivalTime)
       requestError(connfd, filename, "403", "Forbidden", "My Server could not run this CGI program");
       return;
     }
+
     requestServeDynamic(&rio, connfd, filename, cgiargs, bodyLength, arrivalTime);
   }
 }

@@ -54,9 +54,7 @@ char *Getenv(const char *name)
     char *rc;
 
     if ((rc = getenv(name)) == NULL)
-    {
         unix_error("Getenv error");
-    }
     return rc;
 }
 
@@ -147,6 +145,19 @@ int Select(int n, fd_set *readfds, fd_set *writefds,
 
     if ((rc = select(n, readfds, writefds, exceptfds, timeout)) < 0)
         unix_error("Select error");
+    return rc;
+}
+
+/*added level_2*/
+int Pipe(int fd[2])
+{
+    int rc;
+
+    if ((rc = pipe(fd)) < 0)
+    {
+        fprintf(stderr, "pipe	failed:%s\n", strerror(errno)); /*	not	safe	*/
+        exit(1);
+    }
     return rc;
 }
 

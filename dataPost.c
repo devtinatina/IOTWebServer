@@ -9,13 +9,17 @@
 
 int main(int argc, char *argv[])
 {
-  char *astr = "Currently, CGI program is running, but argument passing is not implemented.";
+  int bodylength = atoi(Getenv("CONTENT_LENGTH")) + 1;
+  char buf[MAXBUF];
+  char response[MAXLINE];
+  Read(0, buf, bodylength);
 
-  printf("HTTP/1.0 200 OK\r\n");
-  printf("Server: My Web Server\r\n");
-  printf("Content-Length: %d\r\n", strlen(astr));
-  printf("Content-Type: text/plain\r\n\r\n");
-  printf(astr);
+  sprintf(response, "HTTP/1.0 200 OK\r\n", response);
+  sprintf(response, "%sServer: My Web Server\r\n", response);
+  sprintf(response, "%sContent-Length: %d\r\n", response, bodylength);
+  sprintf(response, "%sContent-Type: text/plain\r\n\r\n", response);
+  sprintf(response, "%s%s\r\n", response, buf);
+  Write(STDOUT_FILENO, response, strlen(response));
   fflush(stdout);
   return (0);
 }

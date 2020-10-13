@@ -18,6 +18,7 @@
 
 void htmlReturn(void)
 {
+  char header[MAXLINE];
   char content[MAXLINE];
   char *buf;
   char *ptr;
@@ -39,9 +40,13 @@ void htmlReturn(void)
   sprintf(content, "%s</body>\r\n</html>\r\n", content);
 
   /* Generate the HTTP response */
-  printf("Content-Length: %d\r\n", strlen(content));
-  printf("Content-Type: text/html\r\n\r\n");
-  printf("%s", content);
+
+  sprintf(header, "%sContent-Length: %d\r\n", header, strlen(content));
+  sprintf(header, "%sContent-Type: text/html\r\n\r\n", header);
+
+  Write(STDOUT_FILENO, header, strlen(header));
+  Write(STDOUT_FILENO, content, strlen(content));
+  Write(STDOUT_FILENO, "\n\n", strlen("\n\n"));
   fflush(stdout);
 }
 
