@@ -147,19 +147,19 @@ void requestServeDynamic(rio_t *rio, int fd, char *filename, char *cgiargs, int 
   int pipe[2];
   char *argv[] = {NULL};
   //added level_2
-  char tbodylengh[MAXLINE];
+  char tbodylength[MAXLINE];
 
   if (bodyLength > 0)
   {
     Rio_readlineb(rio, cgiargs, bodyLength + 1);
   }
-  
-  sprintf(tbodylengh, "%d", strlen(cgiargs));
+
+  sprintf(tbodylength, "%d", strlen(cgiargs));
 
   //added level_2
   Pipe(pipe);
   Setenv("QUERY_STRING", cgiargs, 1);
-  Setenv("CONTENT_LENGTH", tbodylengh, 1);
+  Setenv("CONTENT_LENGTH", tbodylength, 1);
 
   pid = Fork();
 
@@ -169,12 +169,14 @@ void requestServeDynamic(rio_t *rio, int fd, char *filename, char *cgiargs, int 
     //added level_2
     Dup2(pipe[0], STDIN_FILENO);
     Dup2(fd, STDOUT_FILENO);
+    close(pipe[0]);
 
     Execve(filename, argv, environ);
   }
   else if (pid > 0)
   {
-    Write(pipe[1], cgiargs, strlen(cgiargs));
+    Write(pipe[1], cgiargs, strlen(cgiargs) + 1);
+    close(pipe[1]);
     /*	do	parent	job	*/
     Wait(&res);
   }
