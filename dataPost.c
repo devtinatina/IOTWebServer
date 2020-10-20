@@ -165,9 +165,5 @@ int main(void)
 
   cmdProcessing();
 
-  getargs_cp(myname, hostname, &port, filename, &time, &value);
-
-  userTask(myname, hostname, port, port, filename, time, value);
-
   return (0);
 }
