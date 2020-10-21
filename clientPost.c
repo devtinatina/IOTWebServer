@@ -56,6 +56,10 @@ int cmdProcessing(void)
   int tokenNum;
   int exitCode = 0;
   int i;
+<<<<<<< HEAD
+=======
+  int state;
+>>>>>>> 2e37e64... task fix issue1
 
   //command line
   //fputs("If you want to see commands, type 'help'\n", stdout);
@@ -177,7 +181,10 @@ int cmd_random(int argc, char *argv[])
   else
   {
     fputs("Error : please use 1 argv\n", stdout);
+<<<<<<< HEAD
     return 0;
+=======
+>>>>>>> 2e37e64... task fix issue1
   }
 }
 int cmd_quit(int argc, char *argv[])

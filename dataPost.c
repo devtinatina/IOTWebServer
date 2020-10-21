@@ -6,12 +6,15 @@
 #include <assert.h>
 #include <unistd.h>
 
+<<<<<<< HEAD
 /* Database */
 #define DB_HOST "127.0.0.1"
 #define DB_USER "root"
 #define DB_PASS "762486"
 #define DB_NAME "test"
 
+=======
+>>>>>>> 2e37e64... task fix issue1
 //
 // This program is intended to help you test your web server.
 //
@@ -19,6 +22,7 @@
 int main(int argc, char *argv[])
 {
   int bodylength = atoi(Getenv("CONTENT_LENGTH")) + 1;
+<<<<<<< HEAD
   int i = 0, j = 0;
   char buf[MAXBUF];
   char response[MAXLINE];
@@ -34,6 +38,18 @@ int main(int argc, char *argv[])
   sprintf(response, "%s%s\r\n", response, buf);
   Write(STDOUT_FILENO, response, strlen(response));
   fflush(stdout);
+=======
+  char buf[MAXBUF];
+  char response[MAXLINE];
+  Read(0, buf, bodylength);
+>>>>>>> 2e37e64... task fix issue1
 
+  sprintf(response, "HTTP/1.0 200 OK\r\n", response);
+  sprintf(response, "%sServer: My Web Server\r\n", response);
+  sprintf(response, "%sContent-Length: %d\r\n", response, bodylength);
+  sprintf(response, "%sContent-Type: text/plain\r\n\r\n", response);
+  sprintf(response, "%s%s\r\n", response, buf);
+  Write(STDOUT_FILENO, response, strlen(response));
+  fflush(stdout);
   return (0);
 }
