@@ -56,7 +56,6 @@ int cmdProcessing(void)
   int tokenNum;
   int exitCode = 0;
   int i;
-  int state;
 
   //command line
   //fputs("If you want to see commands, type 'help'\n", stdout);
@@ -178,6 +177,7 @@ int cmd_random(int argc, char *argv[])
   else
   {
     fputs("Error : please use 1 argv\n", stdout);
+    return 0;
   }
 }
 int cmd_quit(int argc, char *argv[])
@@ -197,7 +197,7 @@ void clientSend(int fd, char *filename, char *body)
   sprintf(buf, "POST %s HTTP/1.1\n", filename);
   sprintf(buf, "%sHost: %s\n", buf, hostname);
   sprintf(buf, "%sContent-Type: text/plain; charset=utf-8\n", buf);
-  sprintf(buf, "%sContent-Length: %d\n\r\n", buf, strlen(body));
+  sprintf(buf, "%sContent-Length: %lu\n\r\n", buf, strlen(body));
   sprintf(buf, "%s%s\n", buf, body);
   Rio_writen(fd, buf, strlen(buf));
 }

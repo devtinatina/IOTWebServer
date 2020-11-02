@@ -7,7 +7,7 @@ TARGET = server
 
 CC = gcc
 CFLAGS = -g -Wall
-
+DB = $(shell mysql_config --cflags --libs)
 LIBS = -lpthread 
 
 .SUFFIXES: .c .o 
@@ -26,8 +26,8 @@ clientPost: clientPost.o stems.o
 dataGet.cgi: dataGet.c stems.o
 	$(CC) $(CFLAGS) -o dataGet.cgi dataGet.c stems.o
 
-dataPost.cgi: dataPost.c stems.h stems.o
-	$(CC) $(CFLAGS) -o dataPost.cgi dataPost.c stems.o
+dataPost.cgi: dataPost.c stems.h stems.o 
+	$(CC) $(CFLAGS)  -o dataPost.cgi dataPost.c stems.o
 
 .c.o:
 	$(CC) $(CFLAGS) -o $@ -c $<
