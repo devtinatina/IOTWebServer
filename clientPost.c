@@ -56,15 +56,9 @@ int cmdProcessing(void)
   int tokenNum;
   int exitCode = 0;
   int i;
-<<<<<<< HEAD
-=======
-  int state;
->>>>>>> 2e37e64... task fix issue1
-
   //command line
-  //fputs("If you want to see commands, type 'help'\n", stdout);
 
-  fputs(">>", stdout);
+  fputs("\n>>", stdout);
   fgets(cmdLine, STR_LEN, stdin);
 
   //token split
@@ -181,10 +175,8 @@ int cmd_random(int argc, char *argv[])
   else
   {
     fputs("Error : please use 1 argv\n", stdout);
-<<<<<<< HEAD
+
     return 0;
-=======
->>>>>>> 2e37e64... task fix issue1
   }
 }
 int cmd_quit(int argc, char *argv[])
@@ -228,6 +220,7 @@ void clientPrint(int fd)
     /* If you want to look for certain HTTP tags... */
     if (sscanf(buf, "Content-Length: %d ", &length) == 1)
       printf("Length = %d\n", length);
+
     printf("Header: %s", buf);
     n = Rio_readlineb(&rio, buf, MAXBUF);
   }
@@ -313,12 +306,10 @@ int main(void)
     }
     else if (sel == 4)
     { //Send
-      printf("hi\n");
       userTask(myname, hostname, port, filename, time, value);
     }
     else if (sel == 5)
     { //Random
-      printf("hi\n");
       sprintf(temp, "%s", Getenv("RANDOM_NUM"));
       for (int i = 0; i < atoi(temp); i++)
       {

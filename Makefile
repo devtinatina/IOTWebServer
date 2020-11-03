@@ -8,7 +8,9 @@ TARGET = server
 CC = gcc
 CFLAGS = -g -Wall
 LIBS = -lpthread 
-LIBSR = $(shell mysql_config --libs)
+DB = $(shell mysql_config --libs)
+DBB = $(shell mysql_config --cflags)
+DBBB = -L/usr/local/opt/openssl/lib
 
 .SUFFIXES: .c .o 
 
@@ -27,7 +29,7 @@ dataGet.cgi: dataGet.c stems.o
 	$(CC) $(CFLAGS) -o dataGet.cgi dataGet.c stems.o
 
 dataPost.cgi: dataPost.c stems.h stems.o 
-	$(CC) $(CFLAGS) -o dataPost.cgi dataPost.c stems.o 
+	$(CC) $(CFLAGS) -o dataPost.cgi dataPost.c stems.o $(DB) $(DBBB)
 .c.o:
 	$(CC) $(CFLAGS) -o $@ -c $<
 
