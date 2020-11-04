@@ -115,7 +115,7 @@ bool SelectName(MYSQL *connection, char query[], char *name, char *time, char *v
   MYSQL_RES *res;
   MYSQL_ROW row;
 
-  sprintf(query, "select id from sensorList where name='%s'", name);
+  sprintf(query, "select id from sensorList where name='%s';", name);
   if (mysql_query(connection, query))
   {
     //not exist
