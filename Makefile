@@ -26,7 +26,7 @@ clientPost: clientPost.o stems.o
 	$(CC) $(CFLAGS) -o clientPost clientPost.o stems.o $(LIBS)
 
 dataGet.cgi: dataGet.c stems.o
-	$(CC) $(CFLAGS) -o dataGet.cgi dataGet.c stems.o
+	$(CC) $(CFLAGS) -o dataGet.cgi dataGet.c stems.o $(DB) $(DBBB)
 
 dataPost.cgi: dataPost.c stems.h stems.o 
 	$(CC) $(CFLAGS) -o dataPost.cgi dataPost.c stems.o $(DB) $(DBBB)
