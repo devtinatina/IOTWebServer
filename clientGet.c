@@ -150,19 +150,19 @@ int cmd_info(int argc, char *argv[], char webaddr[])
 
 int cmd_get(int argc, char *argv[], char webaddr[])
 {
-  if (argc == 2)
+  if (argc == 2) // argument 1
   {
     sprintf(webaddr, "/dataGet.cgi?command=GET&sname=%s&n=1", argv[1]);
     return 2;
   }
-  if (argc == 3)
+  if (argc == 3) // argument 2
   {
     sprintf(webaddr, "/dataGet.cgi?command=GET&sname=%s&n=%s", argv[1], argv[2]);
     return 2;
   }
   else
   {
-    fputs("Error : this commad don't have argv.\n", stdout);
+    fputs("Error : cmd_get\n", stdout);
     return 0;
   }
 }
@@ -218,7 +218,7 @@ void clientPrint(int fd)
   n = Rio_readlineb(&rio, buf, MAXBUF);
   while (n > 0)
   {
-    printf("%s", buf);
+    printf("%s", buf); // delete header:
     n = Rio_readlineb(&rio, buf, MAXBUF);
   }
 }
@@ -229,10 +229,8 @@ void userTask(char hostname[], int port, char webaddr[])
   int clientfd;
 
   clientfd = Open_clientfd(hostname, port);
-
   clientSend(clientfd, webaddr);
   clientPrint(clientfd);
-
   Close(clientfd);
 }
 
@@ -265,6 +263,7 @@ int main(void)
     }
     else if (sel == 0)
     {
+      // exception when return 0 ;
     }
     else if (sel == 2)
     {

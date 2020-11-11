@@ -1,6 +1,6 @@
 #include "/usr/local/Cellar/mysql/8.0.22/include/mysql/mysql.h"
-#include "stems.h"
 //#include "/usr/include/mysql/mysql.h"
+#include "stems.h"
 #include <string.h>
 #include <sys/time.h>
 #include <assert.h>

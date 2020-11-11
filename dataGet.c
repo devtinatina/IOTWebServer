@@ -88,7 +88,7 @@ void getData(MYSQL *connection, char query[], char *name, int cnt)
       if (mysql_query(connection, query))
       {
         //not exist
-        printf("get fail\n");
+        printf("please input sensor name : info sensor \n");
       }
       else
       {
@@ -106,7 +106,7 @@ void getData(MYSQL *connection, char query[], char *name, int cnt)
       if (mysql_query(connection, query))
       {
         //not exist
-        printf("get fail\n");
+        printf("please input sensor name : get sensor n\n");
       }
       else
       {
