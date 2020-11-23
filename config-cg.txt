@@ -1,3 +1,5 @@
 127.0.0.1
 8080
 /dataGet.cgi?command=LIST&n=1
+temperaturePI
+40

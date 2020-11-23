@@ -195,6 +195,10 @@ int main(int argc, char *argv[])
 
   if (SelectName(connection, query, token[0], token[1], token[2]))
   {
+    sprintf(query, "delete from alarmTable;");
+    mysql_query(connection, query);
+    sprintf(query, "INSERT INTO alarmTable(name, time, value) VALUES('%s', %s, %s);", token[0], token[1], token[2]);
+    mysql_query(connection, query);
     sprintf(response, "%sHTTP/1.0 200 OK\r\n", response);
     sprintf(response, "%sServer: My Web Server\r\n", response);
     sprintf(response, "%sContent-Length: %d\r\n", response, bodylength);

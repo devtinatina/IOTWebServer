@@ -30,7 +30,7 @@ struct CMD
   int (*cmd)(int argc, char *agrv[], char webaddr[]);
 };
 
-int cmdProcessing(char webaddr[]);
+int cmdProcessing(char webaddr[], int threshold);
 extern int cmd_help(int arfc, char *argv[], char webaddr[]);
 extern int cmd_list(int argc, char *argv[], char webaddr[]);
 extern int cmd_info(int arfc, char *argv[], char webaddr[]);
@@ -46,7 +46,7 @@ struct CMD builtin[] = {
 
 int init_myShell(char *);
 
-int cmdProcessing(char webaddr[])
+int cmdProcessing(char webaddr[], int threshold)
 {
   char cmdLine[STR_LEN] = "";
   char *cmdTokens[MAX_TOKENS];
@@ -56,10 +56,6 @@ int cmdProcessing(char webaddr[])
   int exitCode = 0;
   int i;
 
-  //command line
-  //fputs("If you want to see commands, type 'help'\n", stdout);
-
-  fputs(">>", stdout);
   fgets(cmdLine, STR_LEN, stdin);
 
   //token split
@@ -78,7 +74,8 @@ int cmdProcessing(char webaddr[])
   for (i = 0; i < builtins; ++i)
     if (strcmp(cmdTokens[0], builtin[i].name) == 0)
     {
-      return builtin[i].cmd(tokenNum, cmdTokens, webaddr);
+      int res = builtin[i].cmd(tokenNum, cmdTokens, webaddr);
+      return res;
     }
 
   return exitCode;
@@ -150,19 +147,19 @@ int cmd_info(int argc, char *argv[], char webaddr[])
 
 int cmd_get(int argc, char *argv[], char webaddr[])
 {
-  if (argc == 2)
+  if (argc == 2) // argument 1
   {
     sprintf(webaddr, "/dataGet.cgi?command=GET&sname=%s&n=1", argv[1]);
     return 2;
   }
-  if (argc == 3)
+  if (argc == 3) // argument 2
   {
     sprintf(webaddr, "/dataGet.cgi?command=GET&sname=%s&n=%s", argv[1], argv[2]);
     return 2;
   }
   else
   {
-    fputs("Error : this commad don't have argv.\n", stdout);
+    fputs("Error : cmd_get\n", stdout);
     return 0;
   }
 }
@@ -202,6 +199,8 @@ void clientPrint(int fd)
 
   /* Read and display the HTTP Header */
   n = Rio_readlineb(&rio, buf, MAXBUF);
+  if (!(n > 0))
+    return;
   while (strcmp(buf, "\r\n") && (n > 0))
   {
     printf("%s", buf);
@@ -218,9 +217,10 @@ void clientPrint(int fd)
   n = Rio_readlineb(&rio, buf, MAXBUF);
   while (n > 0)
   {
-    printf("%s", buf);
+    printf("%s", buf); // delete header:
     n = Rio_readlineb(&rio, buf, MAXBUF);
   }
+  fputs(">>", stdout);
 }
 
 /* currently, there is no loop. I will add loop later */
@@ -229,14 +229,12 @@ void userTask(char hostname[], int port, char webaddr[])
   int clientfd;
 
   clientfd = Open_clientfd(hostname, port);
-
   clientSend(clientfd, webaddr);
   clientPrint(clientfd);
-
   Close(clientfd);
 }
 
-void getargs_cg(char hostname[], int *port, char webaddr[])
+void getargs_cg(char hostname[], int *port, char webaddr[], char alarmSensor[], int *threshold)
 {
   FILE *fp;
 
@@ -247,29 +245,61 @@ void getargs_cg(char hostname[], int *port, char webaddr[])
   fscanf(fp, "%s", hostname);
   fscanf(fp, "%d", port);
   fscanf(fp, "%s", webaddr);
+  fscanf(fp, "%s", alarmSensor);
+  fscanf(fp, "%d", threshold);
   fclose(fp);
 }
 
 int main(void)
 {
-  char hostname[MAXLINE], webaddr[MAXLINE];
-  int port, sel;
-
-  getargs_cg(hostname, &port, webaddr);
+  char hostname[MAXLINE], webaddr[MAXLINE], alarmSensor[MAXLINE];
+  int port, sel, threshold;
+  int fd, state;
+  struct timeval tv;
+  getargs_cg(hostname, &port, webaddr, alarmSensor, &threshold);
+  fputs(">>", stdout);
+  fflush(NULL);
   while (1)
   {
-    sel = cmdProcessing(webaddr);
+    fd_set readfds;
+    fd = fileno(stdin);
+
+    FD_ZERO(&readfds);
+
+    FD_SET(fd, &readfds);
+    tv.tv_sec = 5;
+    tv.tv_usec = 0;
+    state = select(fd + 1, &readfds, (fd_set *)0, (fd_set *)0, &tv);
+
+    switch (state)
+    {
+    case -1:
+      perror("select error: ");
+      exit(0);
+      break;
+    case 0:
+      sprintf(webaddr, "/dataGet.cgi?command=ALARM&sname=%s&n=%d", alarmSensor, threshold);
+      sel = 2;
+      break;
+    default:
+      sel = cmdProcessing(webaddr, threshold);
+      break;
+    }
+
     if (sel == 1)
     {
       break;
     }
     else if (sel == 0)
     {
+      // exception when return 0 ;
+      fputs(">>", stdout);
     }
     else if (sel == 2)
     {
       userTask(hostname, port, webaddr);
     }
+    fflush(stdout);
   }
 
   return (0);

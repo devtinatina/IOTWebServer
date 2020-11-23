@@ -14,6 +14,7 @@
 void listShow(MYSQL *connection, char query[]);                     // 저장된 센서의 이름을 나열해 주는 함수
 void infoShow(MYSQL *connection, char query[], char *name);         // 해당 센서값의 개수와 평균값 출력
 void getData(MYSQL *connection, char query[], char *name, int cnt); // 해당 이름의 센서값을 특정 개수만큼 출력해주는 함수
+void alarmShow(MYSQL *connection, char query[], char sname[], int threshold);
 
 void listShow(MYSQL *connection, char query[])
 {
@@ -44,23 +45,28 @@ void infoShow(MYSQL *connection, char query[], char *name)
   MYSQL_RES *res;
   MYSQL_ROW row;
 
-  sprintf(query, "select cnt, ave from sensorList where name='%s';", name);
+  int err = 0;
+
+  sprintf(query, "select name, cnt, ave from sensorList where name='%s';", name);
   if (mysql_query(connection, query))
   {
-    //not exist
-    printf("info fail\n");
+    printf("connection fail\n");
   }
   else
   {
-    //exist
     res = mysql_store_result(connection);
     while ((row = mysql_fetch_row(res)) != NULL)
     {
-      printf("%s\n", row[0]);
+      if (strcmp(name, row[0]) == 0)
+        err = 1;
       printf("%s\n", row[1]);
+      printf("%s\n", row[2]);
     }
-
     mysql_free_result(res);
+  }
+  if (err == 0)
+  {
+    printf("%s is Not exist\n", name);
   }
 }
 
@@ -72,12 +78,10 @@ void getData(MYSQL *connection, char query[], char *name, int cnt)
   sprintf(query, "select id, cnt from sensorList where name='%s';", name);
   if (mysql_query(connection, query))
   {
-    //not exist
-    printf("get fail\n");
+    printf("connection fail\n");
   }
   else
   {
-    //exist
     res = mysql_store_result(connection);
     row = mysql_fetch_row(res);
 
@@ -87,8 +91,7 @@ void getData(MYSQL *connection, char query[], char *name, int cnt)
       sprintf(query, "select time, value from sensor%s where idx=%s;", row[0], row[1]);
       if (mysql_query(connection, query))
       {
-        //not exist
-        printf("get fail\n");
+        printf("connection fail\n");
       }
       else
       {
@@ -105,8 +108,7 @@ void getData(MYSQL *connection, char query[], char *name, int cnt)
       sprintf(query, "select time, value from sensor%s order by idx desc;", row[0]); // desc
       if (mysql_query(connection, query))
       {
-        //not exist
-        printf("get fail\n");
+        printf("connection fail\n");
       }
       else
       {
@@ -118,6 +120,41 @@ void getData(MYSQL *connection, char query[], char *name, int cnt)
           printf("%s", ctime(&t));
           printf("%s\n", row[1]);
         }
+      }
+    }
+    mysql_free_result(res);
+  }
+}
+
+void alarmShow(MYSQL *connection, char query[], char sname[], int threshold)
+{
+  MYSQL_RES *res;
+  MYSQL_ROW row;
+
+  sprintf(query, "select * from alarmTable;");
+  if (mysql_query(connection, query))
+  {
+    printf("connection fail\n");
+  }
+  else
+  {
+    res = mysql_store_result(connection);
+    while ((row = mysql_fetch_row(res)) != NULL)
+    {
+      if ((strcmp(row[0], sname) == 0 && threshold < atoi(row[2])))
+      {
+        printf("\r\n");
+        printf("-----threshold value!-----\r\n");
+        printf("%s\n", row[0]);
+        time_t t = atoi(row[1]);
+        printf("%s", ctime(&t));
+        printf("%s\n", row[2]);
+        sprintf(query, "delete from alarmTable;");
+        mysql_query(connection, query);
+      }
+      else
+      {
+        //printf("Not threshold\r\n");
       }
     }
     mysql_free_result(res);
@@ -244,6 +281,11 @@ int main(void)
   if (strcmp(token[0], "GET") == 0)
   {
     getData(connection, query, token[1], atoi(token[2]));
+  }
+
+  if (strcmp(token[0], "ALARM") == 0)
+  {
+    alarmShow(connection, query, token[1], atoi(token[2]));
   }
 
   //htmlReturn();

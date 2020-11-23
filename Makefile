@@ -10,7 +10,7 @@ CFLAGS = -g -Wall
 LIBS = -lpthread 
 DB = $(shell mysql_config --libs)
 DBB = $(shell mysql_config --cflags)
-DBBB = -L/usr/local/opt/openssl/lib
+OPENSSL = -L/usr/local/opt/openssl/lib
 
 .SUFFIXES: .c .o 
 
@@ -26,10 +26,10 @@ clientPost: clientPost.o stems.o
 	$(CC) $(CFLAGS) -o clientPost clientPost.o stems.o $(LIBS)
 
 dataGet.cgi: dataGet.c stems.o
-	$(CC) $(CFLAGS) -o dataGet.cgi dataGet.c stems.o $(DB) $(DBBB)
+	$(CC) $(CFLAGS) -o dataGet.cgi dataGet.c stems.o $(DB) $(OPENSSL)
 
 dataPost.cgi: dataPost.c stems.h stems.o 
-	$(CC) $(CFLAGS) -o dataPost.cgi dataPost.c stems.o $(DB) $(DBBB)
+	$(CC) $(CFLAGS) -o dataPost.cgi dataPost.c stems.o $(DB) $(OPENSSL)
 .c.o:
 	$(CC) $(CFLAGS) -o $@ -c $<
 
